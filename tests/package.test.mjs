@@ -75,7 +75,7 @@ test("packages clean browser archives and a valid CRX3 using a reusable key", as
       assert.deepEqual([...entries.keys()].sort(), [
         "background.js", "content.js", "hide-ai.css", "icons/icon-128.png",
         "icons/icon-16.png", "icons/icon-32.png", "icons/icon-48.png", "manifest.json",
-        "icons/1.svg", "icons/2.svg", "icons/icon-visible-16.png",
+        "icons/visible.svg", "icons/hidden.svg", "icons/icon-visible-16.png",
         "icons/icon-visible-32.png", "icons/icon-visible-48.png", "icons/icon-visible-128.png"
       ].sort());
       const manifest = JSON.parse(entries.get("manifest.json"));

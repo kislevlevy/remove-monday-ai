@@ -101,7 +101,7 @@ or later and does not require Chrome, Firefox, or a system ZIP utility.
 
 ## Development
 
-`extension/icons/2.svg` is the hidden-state icon and `extension/icons/1.svg` is
+`extension/icons/hidden.svg` is the hidden-state icon and `extension/icons/visible.svg` is
 the visible-state icon. Every build generates PNG versions of both using
 `scripts/generate-icons.mjs`. The toolbar switches icons along with the toggle;
 the extension listing uses the hidden-state icon. Generated PNGs are also kept
