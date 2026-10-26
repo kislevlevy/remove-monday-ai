@@ -1,5 +1,5 @@
 /* Stable Monday identifiers from the supplied snapshots. CSS also covers UI
-   inserted later by React, without polling or modifying the app's DOM nodes.
+   inserted later by React, without polling or removing the app's DOM nodes.
    All rules release immediately when the toolbar toggle sets the root attribute. */
 :root:not([data-monday-ai-visible]) :is(
   [data-testid="collapsible-monday-ai-section"],
@@ -33,4 +33,10 @@
   [role="button"][aria-label="Write with AI" i]
 ) {
   display: none !important;
+}
+
+/* Remove the hidden AI header from Monday's stacked sticky offsets, including
+   layouts with extra sections between Favorites and Workspaces. */
+:root:not([data-monday-ai-visible]) [data-monday-ai-adjusted-header] {
+  top: var(--monday-ai-sticky-top) !important;
 }

@@ -67,7 +67,7 @@ for (const [file, selector] of [
 ]) {
   test(`hides supplied ${file} example and restores it without replacing nodes`, async () => {
     const api = mockAPI();
-    const dom = mount(await read(`to-remove/${file}.html`), api);
+    const dom = mount(await read(`.dev/to-remove/${file}.html`), api);
     try {
       await tick();
       const target = dom.window.document.querySelector(selector);
@@ -83,7 +83,7 @@ for (const [file, selector] of [
 }
 
 test("saved homepage targets are hidden while navigation and content stay visible", async () => {
-  const dom = mount(await read("examples/homepage.html"), mockAPI());
+  const dom = mount(await read(".dev/examples/homepage.html"), mockAPI());
   try {
     await tick();
     for (const selector of [
@@ -97,6 +97,10 @@ test("saved homepage targets are hidden while navigation and content stay visibl
     for (const selector of ["#first-level-control", "#first-level-content"]) {
       assert.equal(isHidden(dom.window, dom.window.document.querySelector(selector)), false, selector);
     }
+    const favorites = dom.window.document.querySelector('[data-testid="collapsible-favorites-section"] > [data-testid="collapsible-section"]');
+    const workspace = dom.window.document.querySelector('[data-testid="collapsible-workspaces-section"] > [data-testid="collapsible-section"]');
+    assert.equal(favorites.style.getPropertyValue("--monday-ai-sticky-top"), "0px");
+    assert.equal(workspace.style.getPropertyValue("--monday-ai-sticky-top"), "44px");
   } finally { dom.window.close(); }
 });
 
@@ -166,5 +170,74 @@ test("clearing the setting returns to hidden and unrelated storage changes have 
     assert.ok(dom.window.document.documentElement.hasAttribute("data-monday-ai-visible"));
     api.listeners.change.forEach((fn) => fn({ hideMondayAI: { oldValue: false } }, "local"));
     assert.equal(dom.window.document.documentElement.hasAttribute("data-monday-ai-visible"), false);
+  } finally { dom.window.close(); }
+});
+
+function sidebarMarkup(extraSection = "") {
+  return `<nav data-testid="leftpane"><div class="scroll-container">
+    <div data-testid="collapsible-monday-ai-section"><div data-testid="collapsible-section" style="top: 0px">monday AI</div></div>
+    <div data-testid="collapsible-favorites-section"><div data-testid="collapsible-section" style="position: sticky; top: 44px">Favorites</div></div>
+    ${extraSection}
+    <div data-testid="collapsible-workspaces-section"><div data-testid="collapsible-section" style="position: sticky; top: ${extraSection ? 132 : 88}px">Workspaces</div></div>
+  </div></nav>`;
+}
+
+const adjustedTop = (header) => header.style.getPropertyValue("--monday-ai-sticky-top");
+
+test("sidebar sticky offsets exclude the hidden AI header and release when toggled off", async () => {
+  const api = mockAPI();
+  const dom = mount(sidebarMarkup(), api);
+  try {
+    await tick();
+    const doc = dom.window.document;
+    const favorites = doc.querySelector('[data-testid="collapsible-favorites-section"] > div');
+    const workspace = doc.querySelector('[data-testid="collapsible-workspaces-section"] > div');
+    assert.equal(adjustedTop(favorites), "0px", "no transparent gap above Favorites");
+    assert.equal(adjustedTop(workspace), "44px", "workspace sticks below Favorites");
+    assert.equal(workspace.style.position, "sticky");
+    assert.equal(favorites.style.top, "44px");
+    assert.equal(workspace.style.top, "88px");
+    const rule = [...doc.styleSheets[0].cssRules].find((rule) => rule.selectorText?.includes("data-monday-ai-adjusted-header"));
+    assert.ok(workspace.matches(rule.selectorText));
+    assert.equal(rule.style.getPropertyPriority("top"), "important");
+    await api.storage.local.set({ hideMondayAI: false });
+    assert.equal(workspace.matches(rule.selectorText), false, "native inline offsets apply when AI is visible");
+    await api.storage.local.set({ hideMondayAI: true });
+    assert.ok(workspace.matches(rule.selectorText));
+  } finally { dom.window.close(); }
+});
+
+test("sidebar handles remounts, custom sections, and Monday updating offsets", async () => {
+  const dom = mount("<main></main>", mockAPI());
+  try {
+    dom.window.document.body.insertAdjacentHTML("beforeend", sidebarMarkup('<div data-testid="collapsible-custom-section"><div data-testid="collapsible-section" style="top: 88px">Custom</div></div>'));
+    await tick();
+    const doc = dom.window.document;
+    const custom = doc.querySelector('[data-testid="collapsible-custom-section"] > div');
+    const workspace = doc.querySelector('[data-testid="collapsible-workspaces-section"] > div');
+    assert.equal(adjustedTop(custom), "44px");
+    assert.equal(adjustedTop(workspace), "88px");
+    workspace.style.top = "176px";
+    await tick();
+    assert.equal(adjustedTop(workspace), "132px");
+    workspace.style.backgroundPositionY = "-300px";
+    await tick();
+    assert.equal(adjustedTop(workspace), "132px", "scroll background updates must not subtract twice");
+    doc.querySelector('[data-testid="collapsible-monday-ai-section"]').remove();
+    await tick();
+    assert.equal(adjustedTop(workspace), "");
+    assert.equal(workspace.hasAttribute("data-monday-ai-adjusted-header"), false);
+    assert.equal(workspace.style.top, "176px");
+  } finally { dom.window.close(); }
+});
+
+test("layouts without an AI section keep their native sticky offsets", async () => {
+  const dom = mount('<div><div data-testid="collapsible-workspaces-section"><div data-testid="collapsible-section" style="top: 44px">Workspaces</div></div></div>', mockAPI());
+  try {
+    await tick();
+    const header = dom.window.document.querySelector('[data-testid="collapsible-section"]');
+    assert.equal(adjustedTop(header), "");
+    assert.equal(header.style.top, "44px");
+    assert.equal(header.hasAttribute("data-monday-ai-adjusted-header"), false);
   } finally { dom.window.close(); }
 });

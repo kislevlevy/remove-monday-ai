@@ -30,7 +30,7 @@ Firefox 142 or later is supported.
 
 ## What it hides
 
-The rules cover the supplied `to-remove` examples:
+The rules cover the supplied `.dev/to-remove` examples:
 
 - The entire **monday AI** sidebar section, including Sidekick, Vibe, and Agents.
 - The **Agents** board button and **Vibe** topbar button.
@@ -40,6 +40,10 @@ They also cover the AI credits widget, agent board CTA, AI wand/ask containers,
 and buttons with specific AI action labels such as “Ask AI” and “Write with AI”.
 CSS applies automatically as Monday renders new controls or changes pages.
 Toggling off restores the existing elements without reloading or deleting them.
+The content script also corrects the sidebar's sticky header offsets to exclude
+the hidden 44px AI header. This removes the gap above Favorites and keeps the
+workspace header below the remaining section headers while scrolling. Monday's
+original offsets apply again when hiding is toggled off.
 
 The extension uses targeted Monday identifiers and action labels. It does not
 scan board names, messages, or arbitrary text for the word “AI”. Monday may add
