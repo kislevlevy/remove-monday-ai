@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Monday AI / Vibe Orange-to-Pink Gradient -->
+    <linearGradient id="mondayVibeGrad" x1="15%" y1="20%" x2="85%" y2="75%" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFB129" />
+      <stop offset="45%" stop-color="#FF7B8B" />
+      <stop offset="100%" stop-color="#FF5AC4" />
+    </linearGradient>
+
+    <g id="mondayAiMark">
+      <rect x="29" y="20" width="38" height="84" rx="19" transform="rotate(-30 48 62)" />
+      <rect x="61" y="20" width="38" height="84" rx="19" transform="rotate(30 80 62)" />
+    </g>
+  </defs>
+
+  <!-- Rounded Square Toolbar Tile (Monday Dark Navy) -->
+  <rect width="128" height="128" rx="28" fill="#181B34" />
+
+  <!-- Unblocked Monday AI Heart/V Mark -->
+  <use href="#mondayAiMark" fill="url(#mondayVibeGrad)" />
+
+  <!-- Optional "Visible / Allowed" Status Dot (Monday Green) -->
+  <circle cx="102" cy="102" r="13" fill="#00CA72" stroke="#181B34" stroke-width="6" />
+</svg>

@@ -17,6 +17,11 @@ async function isEnabled() {
 
 async function updateAction(enabled) {
   await Promise.all([
+    api.action.setIcon({
+      path: enabled
+        ? { 16: "icons/icon-16.png", 32: "icons/icon-32.png" }
+        : { 16: "icons/icon-visible-16.png", 32: "icons/icon-visible-32.png" }
+    }),
     api.action.setBadgeText({ text: enabled ? "ON" : "OFF" }),
     api.action.setBadgeBackgroundColor({ color: enabled ? "#176b46" : "#616776" }),
     api.action.setTitle({

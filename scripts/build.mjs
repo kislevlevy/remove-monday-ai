@@ -1,5 +1,7 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 
+await import("./generate-icons.mjs");
+
 const source = new URL("../extension/", import.meta.url);
 const manifest = JSON.parse(await readFile(new URL("manifest.json", source), "utf8"));
 for (const browser of ["chrome", "firefox"]) {

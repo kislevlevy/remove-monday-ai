@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <!-- Monday AI / Vibe Orange-to-Pink Gradient -->
+    <linearGradient id="mondayVibeGrad" x1="15%" y1="20%" x2="85%" y2="75%" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFB129" />
+      <stop offset="45%" stop-color="#FF7B8B" />
+      <stop offset="100%" stop-color="#FF5AC4" />
+    </linearGradient>
+
+    <!-- Combined Heart / V-Pill Geometry -->
+    <g id="mondayAiMark">
+      <!-- Left Tilted Pill -->
+      <rect x="29" y="20" width="38" height="84" rx="19" transform="rotate(-30 48 62)" />
+      <!-- Right Tilted Pill -->
+      <rect x="61" y="20" width="38" height="84" rx="19" transform="rotate(30 80 62)" />
+    </g>
+
+    <!-- Mask to carve a clean knockout gap around the slash for 16x16 toolbar clarity -->
+    <mask id="slashKnockout">
+      <rect width="128" height="128" fill="white" />
+      <line x1="20" y1="20" x2="108" y2="108" stroke="black" stroke-width="24" stroke-linecap="round" />
+    </mask>
+  </defs>
+
+  <!-- Rounded Square Toolbar Tile (Monday Dark Navy) -->
+  <rect width="128" height="128" rx="28" fill="#181B34" />
+
+  <!-- Monday AI Heart/V Mark (Masked by the slash gap) -->
+  <g mask="url(#slashKnockout)">
+    <use href="#mondayAiMark" fill="url(#mondayVibeGrad)" />
+  </g>
+
+  <!-- Bold Red "Remove / Hidden" Slash -->
+  <line x1="22" y1="22" x2="106" y2="106" stroke="#FF3D57" stroke-width="12" stroke-linecap="round" />
+</svg>

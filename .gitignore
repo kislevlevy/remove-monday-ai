@@ -1,3 +1,7 @@
 node_modules/
 dist/
 .dev/
+
+# Chrome CRX signing key (keep private and reuse for updates)
+.keys/
+*.pem

@@ -16,7 +16,8 @@ applies to all open Monday tabs and is saved locally across browser restarts.
 ## Install in Firefox
 
 The generated Firefox package is already in `dist/firefox`. To regenerate it,
-run `npm run build` with Node.js 22 or later; building needs no npm dependencies.
+install development dependencies with `pnpm install`, then run `npm run build`
+with Node.js 22 or later.
 
 1. Open `about:debugging#/runtime/this-firefox`.
 2. Click **Load Temporary Add-on…** and choose `dist/firefox/manifest.json`.
@@ -59,10 +60,55 @@ requests, collects no data, and includes no analytics or runtime dependencies.
 Hiding controls is cosmetic; it does not change Monday account settings or disable
 server-side AI features.
 
-## Development
+## Package for submission
+
+Install development dependencies with `pnpm install`, then run:
 
 ```sh
-npm ci
+pnpm run package
+```
+
+`npm run package` also works after dependencies are installed. The script rebuilds
+both browsers and creates these files in `dist/packages`, using the version from
+`extension/manifest.json`:
+
+- `remove-monday-ai-1.0.0-firefox.zip`: upload to Mozilla Add-ons for review and signing.
+- `remove-monday-ai-1.0.0-chrome.crx`: signed CRX3 package for Chrome distribution.
+- `remove-monday-ai-1.0.0-chrome.zip`: upload to the Chrome Web Store.
+
+The ZIPs contain `manifest.json` at their root and only the built extension files.
+The `.dev` snapshots, tests, dependencies, and signing key are excluded.
+Firefox submission ZIPs are unsigned; Mozilla provides the signed package after
+submission. Chrome Web Store uploads use the ZIP, as described in its
+[publishing instructions](https://developer.chrome.com/docs/webstore/publish).
+A locally signed CRX does not have a Chrome Web Store signature; its installation
+depends on Chrome's distribution policies.
+
+On the first run, the script creates `.keys/chrome.pem` with private file
+permissions. It reuses that key on later runs to keep the CRX extension ID stable.
+The key and generated packages are ignored by Git. Back up the key privately;
+deleting it causes the next default build to generate a new extension identity.
+
+To use an existing RSA private key or choose a different output directory:
+
+```sh
+pnpm run package --key /path/to/existing-chrome.pem --out-dir /path/to/packages
+```
+
+An explicit `--key` must already exist; the script fails if it is missing or invalid.
+`node scripts/package.mjs --help` lists the options. Packaging requires Node.js 22
+or later and does not require Chrome, Firefox, or a system ZIP utility.
+
+## Development
+
+`extension/icons/2.svg` is the hidden-state icon and `extension/icons/1.svg` is
+the visible-state icon. Every build generates PNG versions of both using
+`scripts/generate-icons.mjs`. The toolbar switches icons along with the toggle;
+the extension listing uses the hidden-state icon. Generated PNGs are also kept
+in `extension/icons` so Chrome can load the source folder directly.
+
+```sh
+pnpm install
 npm test
 npm run check
 npm run build

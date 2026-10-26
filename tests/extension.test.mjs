@@ -32,6 +32,7 @@ function mockAPI(initial = {}) {
     },
     action: {
       onClicked: { addListener: (fn) => listeners.click.push(fn) },
+      setIcon: async ({ path }) => { badge.icon = path; },
       setBadgeText: async ({ text }) => { badge.text = text; },
       setBadgeBackgroundColor: async ({ color }) => { badge.color = color; },
       setTitle: async ({ title }) => { badge.title = title; }
@@ -128,15 +129,18 @@ test("toolbar toggles all tabs, persists across background restarts, and seriali
     vm.runInNewContext(background, { chrome: api, console });
     await tick();
     assert.equal(api.badge.text, "ON");
+    assert.equal(api.badge.icon[16], "icons/icon-16.png");
     api.listeners.click[0]();
     await tick();
     assert.equal(api.state.hideMondayAI, false);
     assert.equal(api.badge.text, "OFF");
+    assert.equal(api.badge.icon[16], "icons/icon-visible-16.png");
     for (const dom of tabs) assert.equal(isHidden(dom.window, dom.window.document.getElementById("sidekick-pane")), false);
     const restarted = mockAPI(api.state);
     vm.runInNewContext(background, { browser: restarted, console });
     await tick();
     assert.equal(restarted.badge.text, "OFF");
+    assert.equal(restarted.badge.icon[16], "icons/icon-visible-16.png");
     api.listeners.click[0]();
     api.listeners.click[0]();
     await tick();
